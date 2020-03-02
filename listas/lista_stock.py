@@ -21,7 +21,7 @@ def stockList():
             print(consulta_id)
             miConexion = sqlite3.connect("database.db")
             miCursor = miConexion.cursor()
-            miCursor.execute("SELECT * FROM productos WHERE ID=" + consulta_id)
+            miCursor.execute("SELECT * FROM productos WHERE ID=" + consulta_id + " AND existe=1 ")
             if len(consulta.get()) < 4:
                 messagebox.showwarning("ERROR", "Debes ingresar un articulo correcto")
                 root.deiconify()
@@ -195,7 +195,7 @@ def stockList():
     lista.heading("A" ,text="codigo")
     lista.column("A" ,minwidth=0 ,width=70)
     lista.heading("B" ,text="Descripción")
-    lista.column("B" ,minwidth=0 ,width=240)
+    lista.column("B" ,minwidth=0 ,width=260)
     lista.heading("C" ,text="Precio")
     lista.column("C" ,minwidth=0 ,width=130)
     lista.heading("D" ,text="Color")
