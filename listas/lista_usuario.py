@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox, ttk
+from formulario.usuario_form import usuarioForm
 import os
 import sqlite3
 def usuariosList():
@@ -12,6 +13,7 @@ def usuariosList():
 
     # Variables
     consulta = StringVar()
+
 
     # Funcion Actualiza Datos
     def actualizaLista():
@@ -54,6 +56,27 @@ def usuariosList():
         except:
             messagebox.showwarning("ERROR", "Busqueda invalida, intentalo de nuevo")
             root.deiconify()
+
+
+    # Funcion Eliminar Datos
+    def eliminUsuario():
+        idSelecionado = lista.item(lista.selection())['text']
+        if idSelecionado == "":
+            messagebox.showwarning("Atencion", "Debes seleccionar un registro para eliminar")
+            root.deiconify()
+        else:
+            opcion = messagebox.askquestion("Eliminar", "Estas seguro?")
+            if opcion == "yes":
+                miConexion = sqlite3.connect("database.db")
+                miCursor = miConexion.cursor()
+                miCursor.execute("DELETE FROM usuario WHERE ID=" + str(idSelecionado))
+                miCursor.fetchall()
+                miConexion.commit()
+                messagebox.showinfo("Eliminar",
+                                       " Registro Eliminado")
+                root.deiconify()
+            else:
+                root.deiconify()
 
     # Funcion Editar datos
     def editarUsuario():
@@ -142,10 +165,14 @@ def usuariosList():
     Button(root, image=img_editar, bg="white",command=editarUsuario).place(x=300, y=25)
 
     img_eliminar = PhotoImage(file="img/eliminar.png")
-    Button(root, image=img_eliminar, bg="white").place(x=350, y=25)
+    Button(root, image=img_eliminar, bg="white",command=eliminUsuario).place(x=350, y=25)
 
     img_actualiza = PhotoImage(file="img/actualizar.png")
     Button(root, image=img_actualiza, bg="white", command=actualizaLista).place(x=400, y=25)
+
+    img_agregar = PhotoImage(file="img/agregar-usuario.png")
+    Button(root, image=img_agregar, bg="white", command=usuarioForm).place(x=450, y=25)
+
     # Lista
     root.config(bg="white")
     root.config(cursor="hand2")
