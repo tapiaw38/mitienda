@@ -42,10 +42,10 @@ def productoForm():
             root.deiconify()
         else:
             miCursor.execute("INSERT INTO productos VALUES(NULL, "
-                             "'" + desc.get() +
+                             "'" + desc.get().upper() +
                              "','" + precio.get() +
-                             "','" + color.get() +
-                             "','" + talle.get() +
+                             "','" + color.get().upper() +
+                             "','" + talle.get().upper() +
                              "','" + "1" +
                              "')")
             miConexion.commit()

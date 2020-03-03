@@ -116,10 +116,10 @@ def stockList():
             def actualiza():
                 miConexion = sqlite3.connect("database.db")
                 miCursor = miConexion.cursor()
-                miCursor.execute("UPDATE productos SET descripcion='" + desc.get() +
+                miCursor.execute("UPDATE productos SET descripcion='" + desc.get().upper() +
                                  "', precio='" + precio.get() +
-                                 "', color='" + color.get() +
-                                 "', talla='" + talle.get() +
+                                 "', color='" + color.get().upper() +
+                                 "', talla='" + talle.get().upper() +
                                  "' WHERE ID=" + str(idSelecionado))
                 miConexion.commit()
                 root2.destroy()
