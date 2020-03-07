@@ -56,16 +56,16 @@ def ventaForm():
             miConexion = sqlite3.connect("database.db")
             miCursor = miConexion.cursor()
             if desc.get() == "":
-                messagebox.showerror("ERROR", "Debes completar todos lo campos")
+                messagebox.showerror("ERROR", "Debes ingresar el cofigo de un producto")
                 root.deiconify()
             elif color.get() == "":
-                messagebox.showerror("ERROR", "Debes completar todos lo campos")
+                messagebox.showerror("ERROR", "Debes ingresar el cofigo de un producto")
                 root.deiconify()
             elif talle.get() == "":
-                messagebox.showerror("ERROR", "Debes completar todos lo campos")
+                messagebox.showerror("ERROR", "Debes ingresar el cofigo de un productos")
                 root.deiconify()
             elif precio.get() == "":
-                messagebox.showerror("ERROR", "Debes completar todos lo campos")
+                messagebox.showerror("ERROR", "Debes ingresar el cofigo de un producto")
                 root.deiconify()
             else:
                 # Actualiza el estado de producto
@@ -97,7 +97,7 @@ def ventaForm():
                 messagebox.showinfo("Mis ventas", " Producto vendido!")
 
 
-        elif compra.get() == "1":
+        elif compra.get() == "1" and desc.get() != "":
             root2 = Toplevel()
             root2.title("Venta por planilla")
             root2.geometry("300x200+600+430")
@@ -131,18 +131,15 @@ def ventaForm():
             def vender_planilla():
                 miConexion = sqlite3.connect("database.db")
                 miCursor = miConexion.cursor()
-                if desc.get() == "":
-                    messagebox.showerror("ERROR", "Debes completar todos lo campos")
-                    root.deiconify()
-                elif color.get() == "":
-                    messagebox.showerror("ERROR", "Debes completar todos lo campos")
-                    root.deiconify()
-                elif talle.get() == "":
-                    messagebox.showerror("ERROR", "Debes completar todos lo campos")
-                    root.deiconify()
-                elif precio.get() == "":
-                    messagebox.showerror("ERROR", "Debes completar todos lo campos")
-                    root.deiconify()
+                if nombre.get() == "":
+                    messagebox.showerror("ERROR", "Debes ingresar un cliente")
+                    root2.deiconify()
+                elif abonar.get() == "":
+                    messagebox.showerror("ERROR", "Debes ingresar un monto ejem: '0'")
+                    root2.deiconify()
+                elif not abonar.get().isdigit():
+                    messagebox.showerror("ERROR", "Ingresaste un monto invalido")
+                    root2.deiconify()
                 else:
                     # Actualiza el estado de producto
                     miConexion = sqlite3.connect("database.db")
@@ -200,9 +197,9 @@ def ventaForm():
             #Label(root2, text="* Compra exitosa ", fg="green", bg="white").place(x=10, y=160)
 
             root2.mainloop()
-
-
-
+        elif desc.get() == "":
+            messagebox.showerror("Error", "Debes ingresar el cofigo de un producto")
+            root.deiconify()
     # Busqueda
     Label(root,text="Ingresar Codigo",bg="white").place(x=10,y=30)
     entrada1 = Entry(root,width=15,textvariable=consulta).place(x=120,y=30)
