@@ -76,7 +76,8 @@ def ventaForm():
                 miConexion.commit()
 
                 #Guardar en ventas
-                hoy =str(datetime.datetime.now())
+                hoy =datetime.datetime.today()
+                fecha_hoy = hoy.strftime("%Y-%m-%d")
                 articulo = "ART-"+art.get()
                 miCursor.execute("INSERT INTO venta VALUES(NULL, "
                                  "'" + str(articulo) +
@@ -91,7 +92,7 @@ def ventaForm():
                                  "','" + "" +
                                  "','" + "" +
                                  "','" + "" +
-                                 "','" + hoy +
+                                 "','" + fecha_hoy +
                                  "')")
                 miConexion.commit()
                 messagebox.showinfo("Mis ventas", " Producto vendido!")
