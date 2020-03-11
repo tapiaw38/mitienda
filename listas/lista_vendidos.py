@@ -9,13 +9,14 @@ from random import randint
 from statistics import mean
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from PDF import *
+import webbrowser as wb
+
 
 
 def vendidosList():
     root = Toplevel()
     root.title("Ventas")
-    root.geometry("820x400+300+130")
+    root.geometry("820x415+300+130")
     root.resizable(0, 0)
     root.iconbitmap("img/mitienda.ico")
     # ventana_menu.state("zoomed")#mazimizar ventana
@@ -27,6 +28,7 @@ def vendidosList():
     f5 = StringVar()
     f6 = StringVar()
     consulta = StringVar()
+
 
     # Funciones
 
@@ -51,7 +53,10 @@ def vendidosList():
                          "'")
         productos = miCursor.fetchall()
         data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
+        suma = 0
         for producto in productos:
+            suma += int(producto[3])
+            ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
             lista.insert("", 0, text=str(producto[0]),
                          values=(
                              "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
@@ -59,23 +64,25 @@ def vendidosList():
 
             data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                          str(producto[13])))
-            crear_pdf(data)
+            crear_pdf(data,suma)
 
     def grouper(iterable, n):
         args = [iter(iterable)] * n
         return itertools.zip_longest(*args)
 
-    def crear_pdf(data):
+    def crear_pdf(data,suma):
         c = canvas.Canvas("Mi_Tienda.pdf", pagesize=A4)
         w, h = A4
+        c.drawString(50, h - 30, "Mi Tienda, Reporte de Ventas")
+        c.drawString(350, h - 30, "Dinero en ventas ${}".format(suma))
         max_rows_per_page = 45
         # Margin.
         x_offset = 50
         y_offset = 50
         # Space between rows.
         padding = 15
-        c.drawString(50, h - 35, "Mi Tienda, Reportes de Ventas")
-        xlist = [x + x_offset for x in [0, 40, 170, 220, 350, 410, 490]]
+
+        xlist = [x + x_offset for x in [0,30, 180, 230, 380, 430, 510]]
         ylist = [h - y_offset - i * padding for i in range(max_rows_per_page + 1)]
 
         for rows in grouper(data, max_rows_per_page):
@@ -85,12 +92,10 @@ def vendidosList():
                 for x, cell in zip(xlist, row):
                     c.drawString(x + 2, y - padding + 3, str(cell))
             c.showPage()
-
         c.save()
 
     def abrir_pdf():
-        abrir()
-        root.deiconify()
+        wb.open_new("Mi_tienda.pdf")
 
     # Funcion Buscar Producto
     def buscaDatos():
@@ -110,11 +115,20 @@ def vendidosList():
                 if x != "()":
                     for i in x:
                         lista.delete(i)
+                data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
+                suma = 0
                 for producto in productos:
+                    suma += int(producto[3])
+                    ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
                     lista.insert("", 0, text=str(producto[0]),
                                  values=(
                                      "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
                                      str(producto[5]), str(producto[13])))
+                    data.append(
+                        (str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
+                         str(producto[13])))
+                    crear_pdf(data,suma)
+
         except:
             messagebox.showwarning("ERROR", "Busqueda invalida, intentalo de nuevo")
             root.deiconify()
@@ -132,14 +146,17 @@ def vendidosList():
             " total ,strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
         productos = miCursor.fetchall()
         data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
+        suma = 0
         for producto in productos:
+            suma += int(producto[3])
+            ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
             lista.insert("", 0, text=str(producto[0]),
                          values=(
                              "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
                              str(producto[5]), str(producto[13])))
             data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                          str(producto[13])))
-            crear_pdf(data)
+            crear_pdf(data,suma)
 
     # Busqueda
     Label(root, text="Ingrese codigo", bg="white").place(x=15, y=30)
@@ -178,6 +195,9 @@ def vendidosList():
     Button(root, image=img_actualiza, bg="white", command=actualizaLista).place(x=500, y=30)
     img_txt = PhotoImage(file="img/pdf_2.png")
     Button(root, image=img_txt, bg="white", command=abrir_pdf).place(x=550, y=30)
+    # Muestra cantidad de dinero
+    ventas = Label(root, bg="white", fg="blue", font=12)
+    ventas.place(x=10, y=385)
 
     # Lista
     root.config(bg="white")
@@ -204,13 +224,17 @@ def vendidosList():
                      " total ,strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
     productos = miCursor.fetchall()
     data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
+    suma = 0
     for producto in productos:
+        suma += int(producto[3])
+        ventas.config(text="{}".format("** Dinero en ventas $"+str(suma)+" **"))
         lista.insert("", 0, text=str(producto[0]),
                      values=(
                      "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                      str(producto[13])))
         data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                      str(producto[13])))
-        crear_pdf(data)
+        crear_pdf(data,suma)
+
 
     root.mainloop()

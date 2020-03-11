@@ -95,7 +95,12 @@ def ventaForm():
                                  "','" + fecha_hoy +
                                  "')")
                 miConexion.commit()
-                messagebox.showinfo("Mis ventas", " Producto vendido!")
+                opcion = messagebox.askquestion("Mis ventas", " Producto vendido!\n¿Quieres seguir vendiendo?")
+                if opcion == "yes":
+                    root.destroy()
+                    ventaForm()
+                else:
+                    root.destroy()
 
 
         elif compra.get() == "1" and desc.get() != "":
