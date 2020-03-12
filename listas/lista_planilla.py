@@ -59,7 +59,7 @@ def planillaList():
                                  "' WHERE ID=" + str(idSelecionado))
                 miConexion.commit()
                 root2.destroy()
-                messagebox.askquestion("Felicidades!",
+                messagebox.showinfo("Felicidades!",
                                                 "Pago realizado con exito")
                 root.deiconify()
 
@@ -68,7 +68,7 @@ def planillaList():
             Label(root2, text="Pago de cuenta", bg="white", font=16).place(x=90, y=15)
 
             cliente=Label(root2, fg="blue", bg="white",font=14)
-            cliente.place(x=40, y=60)
+            cliente.place(x=80, y=60)
 
             Label(root2, text="A abonar $", bg="white").place(x=80, y=100)
             entrada6 = Entry(root2, width=10, textvariable=abonar).place(x=150, y=100)

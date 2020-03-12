@@ -71,11 +71,6 @@ productos.add_separator()  # separador de menu
 productos.add_command(label="En Stock",underline=0,image=img_producto,compound=LEFT,command=stockList)
 #productos.add_command(label="Vendidos",underline=0,image=img_ventas,compound=LEFT,command=vendidosList)
 
-img_pdf=PhotoImage(file="img/pdf.png")
-informes = Menu(barramenu, tearoff=0, font=20)
-informes.add_command(label="Ventas hoy",underline=0,image=img_pdf,compound=LEFT)
-informes.add_command(labe="Stock",underline=0,image=img_pdf,compound=LEFT)
-informes.add_command(labe="Deudores",underline=0,image=img_pdf,compound=LEFT)
 
 img_portapapeles=PhotoImage(file="img/portapapeles.png")
 img_cliente=PhotoImage(file="img/chica.png")
@@ -104,8 +99,6 @@ barramenu.add_cascade(label="Acciones", menu=acciones)
 barramenu.add_cascade(label="Productos", menu=productos)
 
 barramenu.add_cascade(label="Ventas", menu=ventas)
-
-barramenu.add_cascade(label="Informes", menu=informes)
 
 barramenu.add_cascade(label="Clientes", menu=clientes)
 
