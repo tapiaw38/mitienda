@@ -40,8 +40,7 @@ def vendidosList():
                 lista.delete(i)
         miConexion = sqlite3.connect("database.db")
         miCursor = miConexion.cursor()
-        miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,"
-                         " deuda, total ,strftime('%d-%m-%Y',fecha) FROM venta WHERE venta=0 AND fecha BETWEEN " + "'" + f3.get() + "-" +
+        miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda,strftime('%d-%m-%Y',fecha) FROM venta WHERE venta=0 AND fecha BETWEEN " + "'" + f3.get() + "-" +
                          f2.get() + "-" +
                          f1.get() +
                          "'" +
@@ -60,10 +59,10 @@ def vendidosList():
             lista.insert("", 0, text=str(producto[0]),
                          values=(
                              "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
-                             str(producto[5]), str(producto[13])))
+                             str(producto[5]), str(producto[12])))
 
             data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                         str(producto[13])))
+                         str(producto[12])))
             crear_pdf(data,suma)
 
     def grouper(iterable, n):
@@ -104,8 +103,7 @@ def vendidosList():
             consulta_id = texto.lstrip("ART-")
             miConexion = sqlite3.connect("database.db")
             miCursor = miConexion.cursor()
-            miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,"
-                             " deuda, total ,strftime('%d-%m-%Y',fecha)  FROM venta WHERE ID=" + consulta_id + " AND venta=0")
+            miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,deuda,strftime('%d-%m-%Y',fecha)  FROM venta WHERE ID=" + consulta_id + " AND venta=0")
             if len(consulta.get()) < 4:
                 messagebox.showwarning("ERROR", "Debes ingresar un articulo correcto")
                 root.deiconify()
@@ -123,10 +121,10 @@ def vendidosList():
                     lista.insert("", 0, text=str(producto[0]),
                                  values=(
                                      "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
-                                     str(producto[5]), str(producto[13])))
+                                     str(producto[5]), str(producto[12])))
                     data.append(
                         (str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                         str(producto[13])))
+                         str(producto[12])))
                     crear_pdf(data,suma)
 
         except:
@@ -142,8 +140,7 @@ def vendidosList():
         miConexion = sqlite3.connect("database.db")
         miCursor = miConexion.cursor()
         miCursor.execute(
-            "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda,"
-            " total ,strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
+            "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda, strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
         productos = miCursor.fetchall()
         data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
         suma = 0
@@ -153,9 +150,9 @@ def vendidosList():
             lista.insert("", 0, text=str(producto[0]),
                          values=(
                              "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
-                             str(producto[5]), str(producto[13])))
+                             str(producto[5]), str(producto[12])))
             data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                         str(producto[13])))
+                         str(producto[12])))
             crear_pdf(data,suma)
 
     # Busqueda
@@ -220,8 +217,7 @@ def vendidosList():
     # Lista de productos vendidos
     miConexion = sqlite3.connect("database.db")
     miCursor = miConexion.cursor()
-    miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda,"
-                     " total ,strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
+    miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda, strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
     productos = miCursor.fetchall()
     data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
     suma = 0
@@ -231,9 +227,9 @@ def vendidosList():
         lista.insert("", 0, text=str(producto[0]),
                      values=(
                      "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                     str(producto[13])))
+                     str(producto[12])))
         data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                     str(producto[13])))
+                     str(producto[12])))
         crear_pdf(data,suma)
 
 

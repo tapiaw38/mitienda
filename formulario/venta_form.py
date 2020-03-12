@@ -91,7 +91,6 @@ def ventaForm():
                                  "','" + "" +
                                  "','" + "" +
                                  "','" + "" +
-                                 "','" + "" +
                                  "','" + fecha_hoy +
                                  "')")
                 miConexion.commit()
@@ -159,7 +158,6 @@ def ventaForm():
                     articulo = "ART-" + art.get()
                     deuda = float(precio.get()) - float(abonar.get())
                     interes = 1
-                    total = deuda * interes
                     miCursor.execute("INSERT INTO venta VALUES(NULL, "
                                      "'" + str(articulo) +
                                      "','" + desc.get().upper() +
@@ -172,7 +170,6 @@ def ventaForm():
                                      "','" + abonar.get() +
                                      "','" + str(interes) +
                                      "','" + str(deuda) +
-                                     "','" + str(total) +
                                      "','" + hoy +
                                      "')")
                     miConexion.commit()
