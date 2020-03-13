@@ -14,11 +14,10 @@ def usuariosList():
     # Variables
     consulta = StringVar()
 
-
     # Funcion Actualiza Datos
     def actualizaLista():
-        x=lista.get_children()
-        if x !="()":
+        x = lista.get_children()
+        if x != "()":
             for i in x:
                 lista.delete(i)
         miConexion = sqlite3.connect("database.db")
@@ -35,7 +34,7 @@ def usuariosList():
             miConexion = sqlite3.connect("database.db")
             miCursor = miConexion.cursor()
             miCursor.execute("SELECT ID, nombre, dni, dir, tel FROM usuario WHERE dni=" + consulta.get())
-            if len(consulta.get())>8 or len(consulta.get())<8:
+            if len(consulta.get()) > 8 or len(consulta.get()) < 8:
                 messagebox.showwarning("ERROR", "Debes ingresar el DNI sin puntos")
                 root.deiconify()
             elif not consulta.get().isdigit():
@@ -46,8 +45,8 @@ def usuariosList():
                 root.deiconify()
             else:
                 usuarios = miCursor.fetchall()
-                x=lista.get_children()
-                if x !="()":
+                x = lista.get_children()
+                if x != "()":
                     for i in x:
                         lista.delete(i)
                 for usuario in usuarios:
@@ -56,7 +55,6 @@ def usuariosList():
         except:
             messagebox.showwarning("ERROR", "Busqueda invalida, intentalo de nuevo")
             root.deiconify()
-
 
     # Funcion Eliminar Datos
     def eliminUsuario():
@@ -73,7 +71,7 @@ def usuariosList():
                 miCursor.fetchall()
                 miConexion.commit()
                 messagebox.showinfo("Eliminar",
-                                       " Registro Eliminado")
+                                    " Registro Eliminado")
                 root.deiconify()
             else:
                 root.deiconify()
@@ -114,23 +112,40 @@ def usuariosList():
             def actualiza():
                 miConexion = sqlite3.connect("database.db")
                 miCursor = miConexion.cursor()
-                miCursor.execute("UPDATE usuario SET nombre='" + nombre.get() +
-                                 "', dni='" + dni.get() +
-                                 "', dir='" + dir.get() +
-                                 "', tel='" + tel.get() +
-                                 "' WHERE ID=" + str(idSelecionado))
-                miConexion.commit()
-                root2.destroy()
-                opcion = messagebox.askquestion("Felicidades!",
-                                                " Registro Modificado\n¿Deseas volver a editar?")
-                if opcion == "yes":
-                    root2.destroy()
-                    root.deiconify()
-                    editarUsuario()
+                if nombre.get() == "":
+                    messagebox.showerror("ERROR", "Debes completar todos lo campos")
+                    root2.deiconify()
+                elif dni.get() == "":
+                    messagebox.showerror("ERROR", "Debes completar todos lo campos")
+                    root2.deiconify()
+                elif len(dni.get()) > 8 or len(dni.get()) < 8:
+                    messagebox.showerror("ERROR", "Debes ingresar un DNI sin puntos \nDebe tener 8 caracteres")
+                    root2.deiconify()
+                elif not dni.get().isdigit():
+                    messagebox.showerror("ERROR", "Ingresaste un DNI invalido")
+                    root2.deiconify()
+                elif dir.get() == "":
+                    messagebox.showerror("ERROR", "Debes completar todos lo campos")
+                    root2.deiconify()
+                elif tel.get() == "":
+                    messagebox.showerror("ERROR", "Debes completar todos lo campos")
+                    root2.deiconify()
+                elif not tel.get().isdigit():
+                    messagebox.showerror("ERROR", "Ingresaste un celular invalido")
+                    root2.deiconify()
+                elif len(tel.get()) > 10 or len(tel.get()) < 10:
+                    messagebox.showerror("ERROR", "Debes ingresar un número sin 0 y 15")
+                    root2.deiconify()
                 else:
+                    miCursor.execute("UPDATE usuario SET nombre='" + nombre.get() +
+                                     "', dni='" + dni.get() +
+                                     "', dir='" + dir.get() +
+                                     "', tel='" + tel.get() +
+                                     "' WHERE ID=" + str(idSelecionado))
+                    miConexion.commit()
                     root2.destroy()
+                    messagebox.showinfo("Felicidades!"," Registro Modificado")
                     root.deiconify()
-
 
             # Titulo de ventana
             img_usuario = PhotoImage(file="img/equipo.png")
@@ -162,10 +177,10 @@ def usuariosList():
     ttk.Button(root, text="Buscar", command=buscaDatos).place(x=190, y=30)
     # Botones
     img_editar = PhotoImage(file="img/editar.png")
-    Button(root, image=img_editar, bg="white",command=editarUsuario).place(x=300, y=25)
+    Button(root, image=img_editar, bg="white", command=editarUsuario).place(x=300, y=25)
 
     img_eliminar = PhotoImage(file="img/eliminar.png")
-    Button(root, image=img_eliminar, bg="white",command=eliminUsuario).place(x=350, y=25)
+    Button(root, image=img_eliminar, bg="white", command=eliminUsuario).place(x=350, y=25)
 
     img_actualiza = PhotoImage(file="img/actualizar.png")
     Button(root, image=img_actualiza, bg="white", command=actualizaLista).place(x=400, y=25)
@@ -176,16 +191,16 @@ def usuariosList():
     # Lista
     root.config(bg="white")
     root.config(cursor="hand2")
-    lista =ttk.Treeview(root ,columns=("A" ,"B" ,"C" ,"D") ,height=14)
-    lista.place(x=18 ,y=80)
-    lista.heading("#0" ,text="#")
-    lista.column("#0" ,minwidth=0 ,width=50)
-    lista.heading("A" ,text="Cliente")
-    lista.heading("B" ,text="DNI")
-    lista.column("B" ,minwidth=0 ,width=130)
-    lista.heading("C" ,text="Dirección")
-    lista.heading("D" ,text="Teléfono")
-    lista.column("D" ,minwidth=0 ,width=130)
+    lista = ttk.Treeview(root, columns=("A", "B", "C", "D"), height=14)
+    lista.place(x=18, y=80)
+    lista.heading("#0", text="#")
+    lista.column("#0", minwidth=0, width=50)
+    lista.heading("A", text="Cliente")
+    lista.heading("B", text="DNI")
+    lista.column("B", minwidth=0, width=130)
+    lista.heading("C", text="Dirección")
+    lista.heading("D", text="Teléfono")
+    lista.column("D", minwidth=0, width=130)
 
     # Lista de Usuarios Cargar datos en lista
     miConexion = sqlite3.connect("database.db")
@@ -195,6 +210,5 @@ def usuariosList():
     for usuario in usuarios:
         lista.insert("", 0, text=usuario[0],
                      values=(str(usuario[1]), str(usuario[2]), str(usuario[3]), str(usuario[4])))
-
 
     root.mainloop()

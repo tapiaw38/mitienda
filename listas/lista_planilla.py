@@ -44,8 +44,6 @@ def planillaList():
             deuda = StringVar()
             abonar.set(0)
 
-
-
             # Funcion Actualiza
             def actualiza():
                 miConexion = sqlite3.connect("database.db")
@@ -60,22 +58,22 @@ def planillaList():
                 miConexion.commit()
                 root2.destroy()
                 messagebox.showinfo("Felicidades!",
-                                                "Pago realizado con exito")
+                                    "Pago realizado con exito")
                 root.deiconify()
 
             img_pagar = PhotoImage(file="img/pagar.png")
             Label(root2, image=img_pagar, bg="white").place(x=35, y=5)
             Label(root2, text="Pago de cuenta", bg="white", font=16).place(x=90, y=15)
 
-            cliente=Label(root2, fg="blue", bg="white",font=14)
+            cliente = Label(root2, fg="blue", bg="white", font=14)
             cliente.place(x=80, y=60)
 
             Label(root2, text="A abonar $", bg="white").place(x=80, y=100)
             entrada6 = Entry(root2, width=10, textvariable=abonar).place(x=150, y=100)
 
-            ttk.Button(root2, text="Confirmar",command=actualiza).place(x=110, y=140)
+            ttk.Button(root2, text="Confirmar", command=actualiza).place(x=110, y=140)
             # Label(root2, text="* Compra exitosa ", fg="green", bg="white").place(x=10, y=160)
-            #insertar datos
+            # insertar datos
             miConexion = sqlite3.connect("database.db")
             miCursor = miConexion.cursor()
             miCursor.execute("SELECT * FROM venta WHERE ID=" + str(idSelecionado))
@@ -83,7 +81,7 @@ def planillaList():
             for planilla in planillas:
                 pago.set(planilla[9])
                 deuda.set(planilla[11])
-                cliente.config(text="{}".format("** "+planilla[7]+" **"))
+                cliente.config(text="{}".format("** " + planilla[7] + " **"))
             miConexion.commit()
 
             root2.mainloop()
@@ -122,8 +120,6 @@ def planillaList():
                 (str(producto[0]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
                  str(producto[12])))
             crear_pdf(data, suma, suma_deuda, suma_total)
-
-
 
     # Buscar por rango de fechas
     def busca_fechas():
@@ -170,7 +166,7 @@ def planillaList():
         args = [iter(iterable)] * n
         return itertools.zip_longest(*args)
 
-    def crear_pdf(data, suma,suma_deuda,suma_total):
+    def crear_pdf(data, suma, suma_deuda, suma_total):
         c = canvas.Canvas("Mi_Tienda.pdf", pagesize=A4)
         w, h = A4
         c.drawString(50, h - 30, "Mi Tienda, Reporte de Ventas")
@@ -231,9 +227,9 @@ def planillaList():
                     total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
                     lista.insert("", 0, text=str(producto[0]),
                                  values=(
-                                 "ART-" + str(producto[0]), str(producto[7]), str(producto[8]), str(producto[2]),
-                                 str(producto[4]), str(producto[5]),
-                                 str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
+                                     "ART-" + str(producto[0]), str(producto[7]), str(producto[8]), str(producto[2]),
+                                     str(producto[4]), str(producto[5]),
+                                     str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
 
                     data.append((str(producto[0]), str(producto[2]), "$" + str(producto[3]), str(producto[7]),
                                  "$" + str(producto[11]),
@@ -278,50 +274,48 @@ def planillaList():
                  str(producto[12])))
             crear_pdf(data, suma, suma_deuda, suma_total)
 
-
-
     # Busqueda
     Label(root, text="Ingrese DNI", bg="white").place(x=15, y=30)
-    entrada5 = Entry(root, width=15,textvariable=consulta).place(x=90, y=30)
-    ttk.Button(root, text="Buscar",command=buscaDatos).place(x=190, y=30)
+    entrada5 = Entry(root, width=15, textvariable=consulta).place(x=90, y=30)
+    ttk.Button(root, text="Buscar", command=buscaDatos).place(x=190, y=30)
 
     # Busqueda por fechas
-    Label(root, text="* Busqueda por fechas *",bg="white",fg="blue").place(x=340, y=0)
+    Label(root, text="* Busqueda por fechas *", bg="white", fg="blue").place(x=340, y=0)
 
     # Desde
-    Label(root,text="Desde",bg="white").place(x=310,y=30)
-    fecha1 = Entry(root, width=3,textvariable=f1)
+    Label(root, text="Desde", bg="white").place(x=310, y=30)
+    fecha1 = Entry(root, width=3, textvariable=f1)
     fecha1.place(x=350, y=30)
-    Label(root,text="-",bg="white").place(x=370,y=30)
-    fecha2 = Entry(root, width=3,textvariable=f2)
+    Label(root, text="-", bg="white").place(x=370, y=30)
+    fecha2 = Entry(root, width=3, textvariable=f2)
     fecha2.place(x=380, y=30)
-    Label(root, text="-",bg="white").place(x=400, y=30)
-    fecha3 = Entry(root, width=5,textvariable=f3)
+    Label(root, text="-", bg="white").place(x=400, y=30)
+    fecha3 = Entry(root, width=5, textvariable=f3)
     fecha3.place(x=410, y=30)
 
     # Hasta
-    Label(root,text="Hasta",bg="white").place(x=310,y=50)
-    fecha4 = Entry(root, width=3,textvariable=f4)
+    Label(root, text="Hasta", bg="white").place(x=310, y=50)
+    fecha4 = Entry(root, width=3, textvariable=f4)
     fecha4.place(x=350, y=50)
-    Label(root,text="-",bg="white").place(x=370,y=50)
-    fecha5 = Entry(root, width=3,textvariable=f5)
+    Label(root, text="-", bg="white").place(x=370, y=50)
+    fecha5 = Entry(root, width=3, textvariable=f5)
     fecha5.place(x=380, y=50)
-    Label(root, text="-",bg="white").place(x=400, y=50)
-    fecha6 = Entry(root, width=5,textvariable=f6)
+    Label(root, text="-", bg="white").place(x=400, y=50)
+    fecha6 = Entry(root, width=5, textvariable=f6)
     fecha6.place(x=410, y=50)
 
-    #Boron buscar fecha
+    # Boron buscar fecha
     img_buscar = PhotoImage(file="img/deuda.png")
-    Button(root, image=img_buscar, bg="white",command=busca_fechas).place(x=450, y=30)
-    #Boton Pagar
+    Button(root, image=img_buscar, bg="white", command=busca_fechas).place(x=450, y=30)
+    # Boton Pagar
     img_pagar = PhotoImage(file="img/pagar.png")
-    Button(root, image=img_pagar, bg="white",command=pagar).place(x=600, y=30)
-    #Boton Actualiza
+    Button(root, image=img_pagar, bg="white", command=pagar).place(x=600, y=30)
+    # Boton Actualiza
     img_actualiza = PhotoImage(file="img/actualizar.png")
     Button(root, image=img_actualiza, bg="white", command=actualizaLista).place(x=650, y=30)
-    #Boton Deudores
+    # Boton Deudores
     img_falta = PhotoImage(file="img/falta.png")
-    Button(root, image=img_falta, bg="white",command=buscaDeudores).place(x=700, y=30)
+    Button(root, image=img_falta, bg="white", command=buscaDeudores).place(x=700, y=30)
     # Imagen pdf
     img_txt = PhotoImage(file="img/pdf_2.png")
     Button(root, image=img_txt, bg="white", command=abrir_pdf).place(x=750, y=30)
@@ -335,34 +329,33 @@ def planillaList():
     total = Label(root, bg="white", fg="green", font=12)
     total.place(x=610, y=385)
 
-
     # Lista
     root.config(bg="white")
     root.config(cursor="hand2")
-    lista =ttk.Treeview(root ,columns=("A" ,"B" ,"C" ,"D","E","F","G","H","I","J") ,height=14)
-    lista.place(x=18 ,y=80)
-    lista.heading("#0" ,text="id")
-    lista.column("#0" ,minwidth=0 ,width=0)
-    lista.heading("A" ,text="Codigo")
-    lista.column("A" ,minwidth=0 ,width=80)
+    lista = ttk.Treeview(root, columns=("A", "B", "C", "D", "E", "F", "G", "H", "I", "J"), height=14)
+    lista.place(x=18, y=80)
+    lista.heading("#0", text="id")
+    lista.column("#0", minwidth=0, width=0)
+    lista.heading("A", text="Codigo")
+    lista.column("A", minwidth=0, width=80)
 
-    lista.heading("B" ,text="Nombre y Apellido")
-    lista.column("B" ,minwidth=0 ,width=150)
-    lista.heading("C" ,text="DNI")
-    lista.column("C" ,minwidth=0 ,width=50)
-    lista.heading("D" ,text="Descripción")
-    lista.heading("E" ,text="Color")
-    lista.column("E" ,minwidth=0 ,width=100)
-    lista.heading("F" ,text="Talla")
-    lista.column("F" ,minwidth=0 ,width=50)
-    lista.heading("G" ,text="Precio")
-    lista.column("G" ,minwidth=0 ,width=70)
-    lista.heading("H" ,text="Fecha")
-    lista.column("H" ,minwidth=0 ,width=100)
-    lista.heading("I" ,text="Pago")
-    lista.column("I" ,minwidth=0 ,width=70)
-    lista.heading("J" ,text="Deuda")
-    lista.column("J" ,minwidth=0 ,width=70)
+    lista.heading("B", text="Nombre y Apellido")
+    lista.column("B", minwidth=0, width=150)
+    lista.heading("C", text="DNI")
+    lista.column("C", minwidth=0, width=50)
+    lista.heading("D", text="Descripción")
+    lista.heading("E", text="Color")
+    lista.column("E", minwidth=0, width=100)
+    lista.heading("F", text="Talla")
+    lista.column("F", minwidth=0, width=50)
+    lista.heading("G", text="Precio")
+    lista.column("G", minwidth=0, width=70)
+    lista.heading("H", text="Fecha")
+    lista.column("H", minwidth=0, width=100)
+    lista.heading("I", text="Pago")
+    lista.column("I", minwidth=0, width=70)
+    lista.heading("J", text="Deuda")
+    lista.column("J", minwidth=0, width=70)
     # Lista de productos vendidos
     miConexion = sqlite3.connect("database.db")
     miCursor = miConexion.cursor()
@@ -377,16 +370,19 @@ def planillaList():
         suma += int(producto[3]) - int(producto[11])
         suma_deuda += int(producto[11])
         suma_total += int(producto[3])
-        ventas.config(text="{}".format("** Ventas $"+str(suma)+" **"))
+        ventas.config(text="{}".format("** Ventas $" + str(suma) + " **"))
         deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
         total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
         lista.insert("", 0, text=str(producto[0]),
-                     values=("ART-" + str(producto[0]),str(producto[7]), str(producto[8]), str(producto[2]), str(producto[4]), str(producto[5]),
-                              str(producto[3]), str(producto[12]),str(producto[9]), str(producto[11])))
+                     values=(
+                     "ART-" + str(producto[0]), str(producto[7]), str(producto[8]), str(producto[2]), str(producto[4]),
+                     str(producto[5]),
+                     str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
 
-        data.append((str(producto[0]), str(producto[2]), "$"+str(producto[3]),str(producto[7]),  "$"+str(producto[11]),
-                    str(producto[12])))
-        crear_pdf(data,suma,suma_deuda,suma_total)
-
+        data.append(
+            (str(producto[0]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
+             str(producto[12])))
+        crear_pdf(data, suma, suma_deuda, suma_total)
 
     root.mainloop()
+

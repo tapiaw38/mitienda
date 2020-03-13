@@ -1,7 +1,7 @@
 import os
 from tkinter import *
-from tkinter import messagebox
-
+from tkinter import messagebox, ttk
+import sqlite3
 # Importaciones de paquetes
 from formulario.venta_form import ventaForm
 from formulario.producto_form import productoForm
@@ -34,6 +34,98 @@ Label(frame, text="Tienda de Ropa Nombre Tienda \nDe Nombre Persona - Direción 
     x=160, y=0)
 
 # funciones internas
+
+
+
+def clave():
+    root2 = Toplevel()
+    root2.title("Ingresar clave de producto")
+    root2.geometry("300x180+450+250")
+    root2.config(bg="white")
+    root2.resizable(0, 0)
+    root2.iconbitmap("img/mitienda.ico")
+    #variables
+
+    ingresar = StringVar()
+    def abrir():
+        global contador
+        miConexion = sqlite3.connect("data.db")
+        miCursor = miConexion.cursor()
+        miCursor.execute("SELECT * FROM pass")
+        clave = miCursor.fetchall()
+        for i in clave:
+            if i[0] == ingresar.get() and 0 == i[1]:
+                messagebox.showinfo("Mi Tienda","Bienvenido a Mi Tienda!")
+                crear_db(root2)
+                miConexion = sqlite3.connect("data.db")
+                miCursor = miConexion.cursor()
+                miCursor.execute("UPDATE pass SET cont=1")
+                miConexion.commit()
+
+            elif i[0] == ingresar.get() and i[1] > 0:
+                messagebox.showerror("Error", "Esta clave ya esta en uso\nConsigue una bitcode@gmail.com")
+            else:
+                messagebox.showerror("Error","Introduce una clave valida")
+                root2.deiconify()
+
+    img_pagar = PhotoImage(file="img/candado.png")
+    Label(root2, image=img_pagar, bg="white").place(x=35, y=5)
+    Label(root2, text="Clave de Producto", bg="white", font=16).place(x=90, y=15)
+    entrada6 = Entry(root2, width=30, show="*",justify="center",textvariable=ingresar)
+    entrada6.place(x=60, y=60)
+    entrada6.focus()
+
+    ttk.Button(root2, text="Confirmar",command=abrir).place(x=110, y=100)
+    root2.mainloop()
+
+
+# Crear tabla producto
+def crear_db(root2):
+    try:
+        bd = sqlite3.connect("database.db")
+        cursor = bd.cursor()
+        tablas = [
+            "CREATE TABLE IF NOT EXISTS productos("
+                "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
+                "descripcion VARCHAR NOT NULL,"
+                "precio REAL NOT NULL,"
+                "color VARCHAR NOT NULL,"
+                "talla VARCHAR NOT NULL,"
+                "existe INTEGER NOT NULL);",
+
+            "CREATE TABLE IF NOT EXISTS usuario("
+                "id INTEGER NOT NULL,"
+                "nombre	INTEGER NOT NULL,"
+                "dni VARCHAR NOT NULL UNIQUE,"
+                "dir VARCHAR NOT NULL,"
+                "tel VARCHAR,"
+                "PRIMARY KEY(id));",
+
+            "CREATE TABLE IF NOT EXISTS venta("
+                "id	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
+                "codigo	VARCHAR NOT NULL,"
+                "descripcion VARCHAR NOT NULL,"
+                "precio	NUMERIC NOT NULL,"
+                "color VARCHAR NOT NULL,"
+                "talla VARCHAR NOT NULL,"
+                "venta INTEGER NOT NULL,"
+                "nombre VARCHAR,"
+                "dni VARCHAR,"
+                "pago REAL,"
+                "interes NUMERIC,"
+                "deuda REAL,"
+                "fecha DATE);"
+
+        ]
+        for tabla in tablas:
+            cursor.execute(tabla);
+        messagebox.showinfo("Crear DB","Tablas creadas correctamente")
+        root2.destroy()
+    except sqlite3.OperationalError as error:
+        messagebox.showinfo("Error al abrir:", error)
+
+
+
 def licencia():
     messagebox.showinfo("Mi Tienda", "Version 1.0 \n2020 all rights reserved.")
 
@@ -56,10 +148,12 @@ ventana_menu.config(menu=barramenu)
 img_calculadora=PhotoImage(file="img/calculadora.png")
 img_notas=PhotoImage(file="img/notas.png")
 img_salida=PhotoImage(file="img/salida.png")
+img_datos=PhotoImage(file="img/llave.png")
 archivo = Menu(barramenu, tearoff=0, font=20)
 archivo.add_command(label="Calculadora",underline=0,image=img_calculadora,compound=LEFT,command=calculadora)
 archivo.add_command(label="Block de notas",underline=0,image=img_notas,compound=LEFT,command=notas)
 archivo.add_separator()
+archivo.add_command(label="Ingresa clave",underline=0,image=img_datos,compound=LEFT,command=clave)
 archivo.add_command(label="Salir", command=salir,underline=0,image=img_salida,compound=LEFT)
 
 img_producto=PhotoImage(file="img/camiseta.png")

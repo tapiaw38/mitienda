@@ -63,6 +63,7 @@ def usuarioForm():
                 usuarioForm()
             else:
                 root.destroy()
+
     # Fin funcion guardar
 
     # Titulo de ventana
@@ -78,13 +79,14 @@ def usuarioForm():
     entrada3 = Entry(root, width=15, textvariable=dni).place(x=120, y=120)
 
     Label(root, text="Dirección", bg="white").place(x=30, y=160)
-    entrada4 = Entry(root, width=25,textvariable=dir).place(x=120, y=160)
+    entrada4 = Entry(root, width=25, textvariable=dir).place(x=120, y=160)
 
     Label(root, text="Telefono", bg="white").place(x=30, y=200)
-    entrada5 = Entry(root, width=15,textvariable=tel).place(x=120, y=200)
+    entrada5 = Entry(root, width=15, textvariable=tel).place(x=120, y=200)
 
     # Boton Guardar
     img_salvar = PhotoImage(file="img/salvar.png")
-    Button(root, image=img_salvar, bg="white",command=guardarUsuario).place(x=114, y=270)
+    Button(root, image=img_salvar, bg="white", command=guardarUsuario).place(x=114, y=270)
 
     root.mainloop()
+

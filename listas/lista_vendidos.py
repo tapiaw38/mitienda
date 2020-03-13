@@ -29,7 +29,6 @@ def vendidosList():
     f6 = StringVar()
     consulta = StringVar()
 
-
     # Funciones
 
     # Buscar por rango de fechas
@@ -40,16 +39,17 @@ def vendidosList():
                 lista.delete(i)
         miConexion = sqlite3.connect("database.db")
         miCursor = miConexion.cursor()
-        miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda,strftime('%d-%m-%Y',fecha) FROM venta WHERE venta=0 AND fecha BETWEEN " + "'" + f3.get() + "-" +
-                         f2.get() + "-" +
-                         f1.get() +
-                         "'" +
-                         " AND " +
-                         "'" +
-                         f6.get() + "-" +
-                         f5.get() + "-" +
-                         f4.get() +
-                         "'")
+        miCursor.execute(
+            "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda,strftime('%d-%m-%Y',fecha) FROM venta WHERE venta=0 AND fecha BETWEEN " + "'" + f3.get() + "-" +
+            f2.get() + "-" +
+            f1.get() +
+            "'" +
+            " AND " +
+            "'" +
+            f6.get() + "-" +
+            f5.get() + "-" +
+            f4.get() +
+            "'")
         productos = miCursor.fetchall()
         data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
         suma = 0
@@ -63,13 +63,13 @@ def vendidosList():
 
             data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                          str(producto[12])))
-            crear_pdf(data,suma)
+            crear_pdf(data, suma)
 
     def grouper(iterable, n):
         args = [iter(iterable)] * n
         return itertools.zip_longest(*args)
 
-    def crear_pdf(data,suma):
+    def crear_pdf(data, suma):
         c = canvas.Canvas("Mi_Tienda.pdf", pagesize=A4)
         w, h = A4
         c.drawString(50, h - 30, "Mi Tienda, Reporte de Ventas")
@@ -81,7 +81,7 @@ def vendidosList():
         # Space between rows.
         padding = 15
 
-        xlist = [x + x_offset for x in [0,30, 180, 230, 380, 430, 510]]
+        xlist = [x + x_offset for x in [0, 30, 180, 230, 380, 430, 510]]
         ylist = [h - y_offset - i * padding for i in range(max_rows_per_page + 1)]
 
         for rows in grouper(data, max_rows_per_page):
@@ -103,7 +103,8 @@ def vendidosList():
             consulta_id = texto.lstrip("ART-")
             miConexion = sqlite3.connect("database.db")
             miCursor = miConexion.cursor()
-            miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,deuda,strftime('%d-%m-%Y',fecha)  FROM venta WHERE ID=" + consulta_id + " AND venta=0")
+            miCursor.execute(
+                "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,deuda,strftime('%d-%m-%Y',fecha)  FROM venta WHERE ID=" + consulta_id + " AND venta=0")
             if len(consulta.get()) < 4:
                 messagebox.showwarning("ERROR", "Debes ingresar un articulo correcto")
                 root.deiconify()
@@ -125,7 +126,7 @@ def vendidosList():
                     data.append(
                         (str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                          str(producto[12])))
-                    crear_pdf(data,suma)
+                    crear_pdf(data, suma)
 
         except:
             messagebox.showwarning("ERROR", "Busqueda invalida, intentalo de nuevo")
@@ -153,7 +154,7 @@ def vendidosList():
                              str(producto[5]), str(producto[12])))
             data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                          str(producto[12])))
-            crear_pdf(data,suma)
+            crear_pdf(data, suma)
 
     # Busqueda
     Label(root, text="Ingrese codigo", bg="white").place(x=15, y=30)
@@ -217,20 +218,21 @@ def vendidosList():
     # Lista de productos vendidos
     miConexion = sqlite3.connect("database.db")
     miCursor = miConexion.cursor()
-    miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda, strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
+    miCursor.execute(
+        "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda, strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
     productos = miCursor.fetchall()
     data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
     suma = 0
     for producto in productos:
         suma += int(producto[3])
-        ventas.config(text="{}".format("** Dinero en ventas $"+str(suma)+" **"))
+        ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
         lista.insert("", 0, text=str(producto[0]),
                      values=(
-                     "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                     str(producto[12])))
+                         "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
+                         str(producto[5]),
+                         str(producto[12])))
         data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                      str(producto[12])))
-        crear_pdf(data,suma)
-
+        crear_pdf(data, suma)
 
     root.mainloop()
