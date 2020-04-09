@@ -73,15 +73,15 @@ def vendidosList():
         c = canvas.Canvas("Mi_Tienda.pdf", pagesize=A4)
         w, h = A4
         c.drawString(50, h - 30, "Mi Tienda, Reporte de Ventas")
-        c.drawString(350, h - 30, "Dinero en ventas ${}".format(suma))
+        c.drawString(50, h - 50, "Dinero en ventas ${}".format(suma))
         max_rows_per_page = 45
         # Margin.
         x_offset = 50
-        y_offset = 50
+        y_offset = 70
         # Space between rows.
         padding = 15
 
-        xlist = [x + x_offset for x in [0, 30, 180, 230, 380, 430, 510]]
+        xlist = [x + x_offset for x in [0, 50, 180, 230, 360, 430, 510]]
         ylist = [h - y_offset - i * padding for i in range(max_rows_per_page + 1)]
 
         for rows in grouper(data, max_rows_per_page):
@@ -231,7 +231,7 @@ def vendidosList():
                          "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
                          str(producto[5]),
                          str(producto[12])))
-        data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
+        data.append(("ART-"+str(producto[0]), str(producto[2]), "$"+str(producto[3]), str(producto[4]), str(producto[5]),
                      str(producto[12])))
         crear_pdf(data, suma)
 

@@ -1,4 +1,3 @@
-import os
 from tkinter import *
 from tkinter import messagebox, ttk
 import sqlite3
@@ -10,6 +9,7 @@ from listas.lista_usuario import usuariosList
 from listas.lista_stock import stockList
 from listas.lista_vendidos import vendidosList
 from listas.lista_planilla import planillaList
+from calc import calc
 
 # configuracion de la raiz de la ventana
 ventana_menu = Tk()
@@ -30,8 +30,8 @@ frame = Frame(ventana_menu)
 frame.config(width=620,height=60)
 frame.config(bg="black")
 frame.place(x=0,y=670)
-Label(frame, text="Tienda de Ropa Nombre Tienda \nDe Nombre Persona - Direción del Local", fg="white", bg="black", font=("Monotype Corsiva", 14)).place(
-    x=160, y=0)
+#Label(frame, text="Tienda de Ropa Nombre Tienda \nDe Nombre Persona - Direción del Local", fg="white", bg="black", font=("Monotype Corsiva", 14)).place(
+#    x=160, y=0)
 
 # funciones internas
 
@@ -134,9 +134,8 @@ def salir():
     if valor == "yes":
         ventana_menu.destroy()
 def calculadora():
-    os.system("calc")
-def notas():
-    os.system("notepad")
+    calc()
+
 
 # funicones de los paquetes
 
@@ -151,7 +150,6 @@ img_salida=PhotoImage(file="img/salida.png")
 img_datos=PhotoImage(file="img/llave.png")
 archivo = Menu(barramenu, tearoff=0, font=20)
 archivo.add_command(label="Calculadora",underline=0,image=img_calculadora,compound=LEFT,command=calculadora)
-archivo.add_command(label="Block de notas",underline=0,image=img_notas,compound=LEFT,command=notas)
 archivo.add_separator()
 archivo.add_command(label="Ingresa clave",underline=0,image=img_datos,compound=LEFT,command=clave)
 archivo.add_command(label="Salir", command=salir,underline=0,image=img_salida,compound=LEFT)

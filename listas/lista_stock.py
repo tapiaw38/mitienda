@@ -183,11 +183,14 @@ def stockList():
     img_editar = PhotoImage(file="img/editar.png")
     Button(root, image=img_editar, bg="white", command=editarProducto).place(x=300, y=25)
 
-    #img_eliminar = PhotoImage(file="img/eliminar.png")
-    #Button(root, image=img_eliminar, bg="white", command=eliminaProducto).place(x=350, y=25)
-
     img_actualiza = PhotoImage(file="img/actualizar.png")
     Button(root, image=img_actualiza, bg="white", command=actualizaLista).place(x=350, y=25)
+
+    img_eliminar = PhotoImage(file="img/eliminar.png")
+    Button(root, image=img_eliminar, bg="white").place(x=400, y=25)
+
+    img_pdf = PhotoImage(file="img/pdf_2.png")
+    Button(root, image=img_pdf, bg="white").place(x=450, y=25)
 
     # Lista
     root.config(bg="white")
