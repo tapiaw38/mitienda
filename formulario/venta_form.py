@@ -111,6 +111,7 @@ def ventaForm():
             nombre = StringVar()
             dni = StringVar()
             abonar = StringVar()
+            abonar.set(0)
 
             # Buscar persona
             def buscar_persona():

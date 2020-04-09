@@ -57,6 +57,24 @@ def stockList():
                                  str(producto[4])))
 
     # Funcion Eliminar Datos
+
+    def eliminaProducto():
+        idSelecionado = lista.item(lista.selection())['text']
+        if idSelecionado == "":
+            messagebox.showwarning("Atencion", "Debes seleccionar un registro para eliminar")
+            root.deiconify()
+        else:
+            opcion = messagebox.askquestion("Eliminar", "Estas seguro de eliminar este registro?")
+            if opcion == "yes":
+                miCursor.execute("UPDATE productos SET existe=0 WHERE ID=" + str(idSelecionado))
+                miConexion.commit()
+                messagebox.showinfo("Eliminar",
+                                    " Registro Eliminado")
+                root.deiconify()
+            else:
+                root.deiconify()
+
+    """
     def eliminaProducto():
         idSelecionado = lista.item(lista.selection())['text']
         if idSelecionado == "":
@@ -75,7 +93,8 @@ def stockList():
                 root.deiconify()
             else:
                 root.deiconify()
-
+    
+    """
     # Editar Producto
     def editarProducto():
         idSelecionado = lista.item(lista.selection())['text']
@@ -187,7 +206,7 @@ def stockList():
     Button(root, image=img_actualiza, bg="white", command=actualizaLista).place(x=350, y=25)
 
     img_eliminar = PhotoImage(file="img/eliminar.png")
-    Button(root, image=img_eliminar, bg="white").place(x=400, y=25)
+    Button(root, image=img_eliminar, bg="white",command=eliminaProducto).place(x=400, y=25)
 
     img_pdf = PhotoImage(file="img/pdf_2.png")
     Button(root, image=img_pdf, bg="white").place(x=450, y=25)

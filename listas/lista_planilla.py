@@ -112,12 +112,12 @@ def planillaList():
             deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
             total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
             lista.insert("", 0, text=str(producto[0]),
-                         values=("ART-" + str(producto[0]), str(producto[7]), str(producto[8]), str(producto[2]),
+                         values=(str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]),
                                  str(producto[4]), str(producto[5]),
                                  str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
 
             data.append(
-                (str(producto[0]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
+                (str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
                  str(producto[12])))
             crear_pdf(data, suma, suma_deuda, suma_total)
 
@@ -153,12 +153,12 @@ def planillaList():
             deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
             total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
             lista.insert("", 0, text=str(producto[0]),
-                         values=("ART-" + str(producto[0]), str(producto[7]), str(producto[8]), str(producto[2]),
+                         values=(str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]),
                                  str(producto[4]), str(producto[5]),
                                  str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
 
             data.append(
-                (str(producto[0]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
+                (str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
                  str(producto[12])))
             crear_pdf(data, suma, suma_deuda, suma_total)
 
@@ -170,17 +170,17 @@ def planillaList():
         c = canvas.Canvas("Mi_Tienda.pdf", pagesize=A4)
         w, h = A4
         c.drawString(50, h - 30, "Mi Tienda, Reporte de Ventas")
-        c.drawString(250, h - 30, "Ventas ${}".format(suma))
-        c.drawString(350, h - 30, "Deudas ${}".format(suma_deuda))
-        c.drawString(450, h - 30, "Total ${}".format(suma_total))
+        c.drawString(50, h - 50, "Ventas ${}".format(suma))
+        c.drawString(150, h - 50, "Deudas ${}".format(suma_deuda))
+        c.drawString(250, h - 50, "Total ${}".format(suma_total))
         max_rows_per_page = 45
         # Margin.
         x_offset = 50
-        y_offset = 50
+        y_offset = 70
         # Space between rows.
         padding = 15
 
-        xlist = [x + x_offset for x in [0, 30, 180, 230, 380, 430, 510]]
+        xlist = [x + x_offset for x in [0, 40, 180, 230, 380, 430, 510]]
         ylist = [h - y_offset - i * padding for i in range(max_rows_per_page + 1)]
 
         for rows in grouper(data, max_rows_per_page):
@@ -227,11 +227,11 @@ def planillaList():
                     total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
                     lista.insert("", 0, text=str(producto[0]),
                                  values=(
-                                     "ART-" + str(producto[0]), str(producto[7]), str(producto[8]), str(producto[2]),
+                                     str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]),
                                      str(producto[4]), str(producto[5]),
                                      str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
 
-                    data.append((str(producto[0]), str(producto[2]), "$" + str(producto[3]), str(producto[7]),
+                    data.append((str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]),
                                  "$" + str(producto[11]),
                                  str(producto[12])))
                     crear_pdf(data, suma, suma_deuda, suma_total)
@@ -265,12 +265,12 @@ def planillaList():
             deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
             total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
             lista.insert("", 0, text=str(producto[0]),
-                         values=("ART-" + str(producto[0]), str(producto[7]), str(producto[8]), str(producto[2]),
+                         values=(str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]),
                                  str(producto[4]), str(producto[5]),
                                  str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
 
             data.append(
-                (str(producto[0]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
+                (str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
                  str(producto[12])))
             crear_pdf(data, suma, suma_deuda, suma_total)
 
@@ -375,12 +375,12 @@ def planillaList():
         total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
         lista.insert("", 0, text=str(producto[0]),
                      values=(
-                     "ART-" + str(producto[0]), str(producto[7]), str(producto[8]), str(producto[2]), str(producto[4]),
+                     str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]), str(producto[4]),
                      str(producto[5]),
                      str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
 
         data.append(
-            (str(producto[0]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
+            (str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
              str(producto[12])))
         crear_pdf(data, suma, suma_deuda, suma_total)
 

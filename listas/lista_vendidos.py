@@ -58,10 +58,10 @@ def vendidosList():
             ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
             lista.insert("", 0, text=str(producto[0]),
                          values=(
-                             "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
+                             str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
                              str(producto[5]), str(producto[12])))
 
-            data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
+            data.append((str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                          str(producto[12])))
             crear_pdf(data, suma)
 
@@ -121,10 +121,10 @@ def vendidosList():
                     ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
                     lista.insert("", 0, text=str(producto[0]),
                                  values=(
-                                     "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
+                                     str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
                                      str(producto[5]), str(producto[12])))
                     data.append(
-                        (str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
+                        (str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                          str(producto[12])))
                     crear_pdf(data, suma)
 
@@ -150,9 +150,9 @@ def vendidosList():
             ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
             lista.insert("", 0, text=str(producto[0]),
                          values=(
-                             "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
+                             str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
                              str(producto[5]), str(producto[12])))
-            data.append((str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
+            data.append((str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
                          str(producto[12])))
             crear_pdf(data, suma)
 
@@ -228,10 +228,10 @@ def vendidosList():
         ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
         lista.insert("", 0, text=str(producto[0]),
                      values=(
-                         "ART-" + str(producto[0]), str(producto[2]), str(producto[3]), str(producto[4]),
+                         str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
                          str(producto[5]),
                          str(producto[12])))
-        data.append(("ART-"+str(producto[0]), str(producto[2]), "$"+str(producto[3]), str(producto[4]), str(producto[5]),
+        data.append((str(producto[1]), str(producto[2]), "$"+str(producto[3]), str(producto[4]), str(producto[5]),
                      str(producto[12])))
         crear_pdf(data, suma)
 
