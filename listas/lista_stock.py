@@ -163,12 +163,12 @@ def stockList():
             codigo_producto.place(x=120, y=90)
 
             # Leer id y codigo de producto
-            miConexion = sqlite3.connect("database.db")
+            miConexion = conexion_psql()
             miCursor = miConexion.cursor()
-            miCursor.execute("SELECT * FROM productos WHERE ID=" + str(idSelecionado))
+            miCursor.execute("SELECT * FROM producto WHERE ID=" + str(idSelecionado))
             productos = miCursor.fetchall()
             for producto in productos:
-                codigo_producto.config(text="{}".format("ART-" + str(producto[0])))
+                codigo_producto.config(text="{}".format(producto[1]))
 
 
             # Campos de formulario
