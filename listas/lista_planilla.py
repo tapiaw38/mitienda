@@ -229,7 +229,7 @@ def planillaList():
                 "SELECT venta.id, producto.codigo, usuario.nombre, usuario.dni, producto.descripcion, producto.color, producto.talla, producto.precio,"
                 " to_char( venta.fecha , 'DD-MON-YYYY') AS fecha_formato, venta.pago, venta.deuda FROM venta INNER JOIN producto"
                 " ON venta.producto = producto.id INNER JOIN usuario ON venta.usuario = usuario.id"
-                " WHERE venta.venta=false AND producto.codigo='" + consulta.get().upper() + "'"
+                " WHERE venta.venta=false AND usuario.dni='" + consulta.get().upper() + "'"
             )
             if len(consulta.get()) < 4:
                 messagebox.showwarning("ERROR", "Debes ingresar un articulo correcto")
