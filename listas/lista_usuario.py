@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox, ttk
 from formulario.usuario_form import usuarioForm
+from conexion import conexion_psql
 import os
 import sqlite3
 def usuariosList():
@@ -20,20 +21,15 @@ def usuariosList():
         if x != "()":
             for i in x:
                 lista.delete(i)
-        miConexion = sqlite3.connect("database.db")
-        miCursor = miConexion.cursor()
-        miCursor.execute("SELECT ID, nombre, dni, dir, tel FROM usuario")
-        usuarios = miCursor.fetchall()
-        for usuario in usuarios:
-            lista.insert("", 0, text=usuario[0],
-                         values=(str(usuario[1]), str(usuario[2]), str(usuario[3]), str(usuario[4])))
+        inserta_usuario()
+
 
     # Funcion Buscar Usuarios
     def buscaDatos():
         try:
-            miConexion = sqlite3.connect("database.db")
+            miConexion = conexion_psql()
             miCursor = miConexion.cursor()
-            miCursor.execute("SELECT ID, nombre, dni, dir, tel FROM usuario WHERE dni=" + consulta.get())
+            miCursor.execute("SELECT id, nombre, dni, dir, tel FROM usuario WHERE dni=" + "'" + consulta.get() + "'")
             if len(consulta.get()) > 8 or len(consulta.get()) < 8:
                 messagebox.showwarning("ERROR", "Debes ingresar el DNI sin puntos")
                 root.deiconify()
@@ -97,7 +93,7 @@ def usuariosList():
             dir = StringVar()
             tel = StringVar()
 
-            miConexion = sqlite3.connect("database.db")
+            miConexion = conexion_psql()
             miCursor = miConexion.cursor()
             miCursor.execute("SELECT ID, nombre, dni, dir, tel FROM usuario WHERE ID=" + str(idSelecionado))
             usuarios = miCursor.fetchall()
@@ -110,7 +106,7 @@ def usuariosList():
 
             # Funcion Actualiza
             def actualiza():
-                miConexion = sqlite3.connect("database.db")
+                miConexion = conexion_psql()
                 miCursor = miConexion.cursor()
                 if nombre.get() == "":
                     messagebox.showerror("ERROR", "Debes completar todos lo campos")
@@ -203,12 +199,16 @@ def usuariosList():
     lista.column("D", minwidth=0, width=130)
 
     # Lista de Usuarios Cargar datos en lista
-    miConexion = sqlite3.connect("database.db")
-    miCursor = miConexion.cursor()
-    miCursor.execute("SELECT ID, nombre, dni, dir, tel FROM usuario")
-    usuarios = miCursor.fetchall()
-    for usuario in usuarios:
-        lista.insert("", 0, text=usuario[0],
-                     values=(str(usuario[1]), str(usuario[2]), str(usuario[3]), str(usuario[4])))
+    def inserta_usuario():
+        miConexion = conexion_psql()
+        miCursor = miConexion.cursor()
+        miCursor.execute("SELECT ID, nombre, dni, dir, tel FROM usuario")
+        usuarios = miCursor.fetchall()
+        for usuario in usuarios:
+            lista.insert("", 0, text=usuario[0],
+                         values=(str(usuario[1]), str(usuario[2]), str(usuario[3]), str(usuario[4])))
+
+    inserta_usuario()
+
 
     root.mainloop()

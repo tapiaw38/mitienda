@@ -1,8 +1,12 @@
+# Python.
 from tkinter import *
 from tkinter import messagebox, ttk
 import os
 import sqlite3
+# Modulos.
+from conexion import conexion_psql
 from listas.lista_stock import stockList
+
 
 def productoForm():
         root = Toplevel()
@@ -23,7 +27,7 @@ def productoForm():
 
         # Guardar Producto
         def guardarProducto():
-            miConexion = sqlite3.connect("database.db")
+            miConexion = conexion_psql()
             miCursor = miConexion.cursor()
             if desc.get() == "":
                 messagebox.showerror("ERROR", "Debes completar todos lo campos")
@@ -41,12 +45,13 @@ def productoForm():
                 messagebox.showerror("ERROR", "Ingresaste un monto invalido")
                 root.deiconify()
             else:
-                miCursor.execute("INSERT INTO productos VALUES(NULL, "
-                                 "'" + desc.get().upper() +
+                miCursor.execute("INSERT INTO producto (codigo, descripcion, precio, color, talla, existe) VALUES("
+                                 "'" + codigo +
+                                 "','" + desc.get().upper() +
                                  "','" + precio.get() +
                                  "','" + color.get().upper() +
                                  "','" + talle.get().upper() +
-                                 "','" + "1" +
+                                 "','" + "True" +
                                  "')")
                 miConexion.commit()
                 opcion = messagebox.askquestion("Felicidades!", " Registro Guardado\n¿Deseas ingresar uno nuevo?")
@@ -69,13 +74,13 @@ def productoForm():
         codigo_producto.place(x=120,y=90)
 
         # Leer id y codigo de producto
-        miConexion = sqlite3.connect("database.db")
+        miConexion = conexion_psql()
         miCursor = miConexion.cursor()
-        miCursor.execute("SELECT * FROM productos")
+        miCursor.execute("SELECT * FROM producto")
         productos = miCursor.fetchall()
-        for producto in productos:
-            codigo_producto.config(text="{}".format("ART-"+str(producto[0] + 1)))
-            codigo = "ART"+str(producto[0] + 1)
+        codigo_producto.config(text="{}".format("ART-"+str(len(productos) + 1)))
+        global codigo
+        codigo = "ART-"+str(len(productos) + 1)
         miConexion.commit()
 
         # Campos de formulario

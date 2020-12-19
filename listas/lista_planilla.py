@@ -6,6 +6,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 import webbrowser as wb
 import itertools
+from conexion import conexion_psql
 
 
 
@@ -39,26 +40,28 @@ def planillaList():
             root2.resizable(0, 0)
             root2.iconbitmap("img/mitienda.ico")
             # Variables
-            abonar = StringVar()
-            pago = StringVar()
-            deuda = StringVar()
+            abonar = IntVar()
+            pago = IntVar()
+            deuda = IntVar()
             abonar.set(0)
 
             # Funcion Actualiza
             def actualiza():
-                miConexion = sqlite3.connect("database.db")
-                miCursor = miConexion.cursor()
-
-                pago_total = float(pago.get()) + float(abonar.get())
-                deuda_total = float(deuda.get()) - float(abonar.get())
-
-                miCursor.execute("UPDATE venta SET pago='" + str(pago_total) +
-                                 "', deuda='" + str(deuda_total) +
-                                 "' WHERE ID=" + str(idSelecionado))
-                miConexion.commit()
-                root2.destroy()
-                messagebox.showinfo("Felicidades!",
-                                    "Pago realizado con exito")
+                pago_total = pago.get() + abonar.get()
+                deuda_total = deuda.get() - abonar.get()
+                if deuda_total < 0:
+                    root2.destroy()
+                    messagebox.showerror("ERROR", "Ingresaste un monto mayor a la deuda, intentalo de nuevo")
+                else:
+                    miConexion = conexion_psql()
+                    miCursor = miConexion.cursor()
+                    miCursor.execute("UPDATE venta SET pago='" + str(pago_total) +
+                                     "', deuda='" + str(deuda_total) +
+                                     "' WHERE id=" + str(idSelecionado))
+                    miConexion.commit()
+                    root2.destroy()
+                    messagebox.showinfo("Felicidades!",
+                                        "Pago realizado con exito")
                 root.deiconify()
 
             img_pagar = PhotoImage(file="img/pagar.png")
@@ -73,15 +76,19 @@ def planillaList():
 
             ttk.Button(root2, text="Confirmar", command=actualiza).place(x=110, y=140)
             # Label(root2, text="* Compra exitosa ", fg="green", bg="white").place(x=10, y=160)
+
             # insertar datos
-            miConexion = sqlite3.connect("database.db")
+            miConexion = conexion_psql()
             miCursor = miConexion.cursor()
-            miCursor.execute("SELECT * FROM venta WHERE ID=" + str(idSelecionado))
+            miCursor.execute(
+                "SELECT usuario.nombre, venta.pago, venta.deuda FROM venta INNER JOIN usuario ON "
+                "venta.usuario = usuario.id WHERE venta.id=" + str(idSelecionado)
+            )
             planillas = miCursor.fetchall()
             for planilla in planillas:
-                pago.set(planilla[9])
-                deuda.set(planilla[11])
-                cliente.config(text="{}".format("** " + planilla[7] + " **"))
+                pago.set(planilla[1])
+                deuda.set(planilla[2])
+                cliente.config(text="{}".format("** " + planilla[0] + " **"))
             miConexion.commit()
 
             root2.mainloop()
@@ -90,35 +97,43 @@ def planillaList():
 
     # Buscar Deudores
     def buscaDeudores():
-        miConexion = sqlite3.connect("database.db")
+        miConexion = conexion_psql()
         miCursor = miConexion.cursor()
-        miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,"
-                         "deuda,strftime('%d-%m-%Y',fecha)  FROM venta WHERE deuda > 0 AND venta=1")
-
+        miCursor.execute(
+            "SELECT venta.id, producto.codigo, usuario.nombre, usuario.dni, producto.descripcion, producto.color, producto.talla, producto.precio,"
+            " to_char( venta.fecha , 'DD-MON-YYYY') AS fecha_formato, venta.pago, venta.deuda FROM venta INNER JOIN producto"
+            " ON venta.producto = producto.id INNER JOIN usuario ON venta.usuario = usuario.id"
+            " WHERE venta.venta=false AND venta.deuda > 0"
+        )
         productos = miCursor.fetchall()
         x = lista.get_children()
         if x != "()":
             for i in x:
                 lista.delete(i)
+
         data = [("COD", "DESCRIPCION", "PRECIO", "CLIENTE", "DEUDA", "FECHA")]
         suma = 0
         suma_deuda = 0
         suma_total = 0
         for producto in productos:
-            suma += int(producto[3]) - int(producto[11])
-            suma_deuda += int(producto[11])
-            suma_total += int(producto[3])
+            suma += int(producto[7]) - int(producto[10])
+            suma_deuda += int(producto[10])
+            suma_total += int(producto[7])
             ventas.config(text="{}".format("** Ventas $" + str(suma) + " **"))
             deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
             total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
             lista.insert("", 0, text=str(producto[0]),
-                         values=(str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]),
-                                 str(producto[4]), str(producto[5]),
-                                 str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
+                         values=(
+                             str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
+                             str(producto[5]),
+                             str(producto[6]),
+                             str(producto[7]), str(producto[8]), str(producto[9]), str(producto[10])))
 
             data.append(
-                (str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
-                 str(producto[12])))
+                (str(producto[1]), str(producto[4]), "$" + str(producto[7]), str(producto[2]),
+                 "$" + str(producto[10]),
+                 str(producto[8])))
+
             crear_pdf(data, suma, suma_deuda, suma_total)
 
     # Buscar por rango de fechas
@@ -127,39 +142,48 @@ def planillaList():
         if x != "()":
             for i in x:
                 lista.delete(i)
-        miConexion = sqlite3.connect("database.db")
+        miConexion = conexion_psql()
         miCursor = miConexion.cursor()
-        miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,"
-                         "deuda,strftime('%d-%m-%Y',fecha) FROM venta WHERE venta=1 AND fecha BETWEEN " + "'" + f3.get() + "-" +
-                         f2.get() + "-" +
-                         f1.get() +
-                         "'" +
-                         " AND " +
-                         "'" +
-                         f6.get() + "-" +
-                         f5.get() + "-" +
-                         f4.get() +
-                         "'")
+        miCursor.execute(
+
+            "SELECT venta.id, producto.codigo, usuario.nombre, usuario.dni, producto.descripcion, producto.color, producto.talla, producto.precio,"
+            " to_char( venta.fecha , 'DD-MON-YYYY') AS fecha_formato, venta.pago, venta.deuda FROM venta INNER JOIN producto"
+            " ON venta.producto = producto.id INNER JOIN usuario ON venta.usuario = usuario.id"
+            " WHERE venta.venta=false AND venta.fecha BETWEEN " + "'" + f3.get() + "/" +
+            f2.get() + "/" +
+            f1.get() +
+            "'" +
+            " AND " +
+            "'" +
+            f6.get() + "/" +
+            f5.get() + "/" +
+            f4.get() +
+            "'"
+        )
         productos = miCursor.fetchall()
         data = [("COD", "DESCRIPCION", "PRECIO", "CLIENTE", "DEUDA", "FECHA")]
         suma = 0
         suma_deuda = 0
         suma_total = 0
         for producto in productos:
-            suma += int(producto[3]) - int(producto[11])
-            suma_deuda += int(producto[11])
-            suma_total += int(producto[3])
+            suma += int(producto[7]) - int(producto[10])
+            suma_deuda += int(producto[10])
+            suma_total += int(producto[7])
             ventas.config(text="{}".format("** Ventas $" + str(suma) + " **"))
             deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
             total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
             lista.insert("", 0, text=str(producto[0]),
-                         values=(str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]),
-                                 str(producto[4]), str(producto[5]),
-                                 str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
+                         values=(
+                             str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
+                             str(producto[5]),
+                             str(producto[6]),
+                             str(producto[7]), str(producto[8]), str(producto[9]), str(producto[10])))
 
             data.append(
-                (str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
-                 str(producto[12])))
+                (str(producto[1]), str(producto[4]), "$" + str(producto[7]), str(producto[2]),
+                 "$" + str(producto[10]),
+                 str(producto[8])))
+
             crear_pdf(data, suma, suma_deuda, suma_total)
 
     def grouper(iterable, n):
@@ -199,12 +223,14 @@ def planillaList():
 
     def buscaDatos():
         try:
-            texto = consulta.get().upper()
-            consulta_id = texto.lstrip("ART-")
-            miConexion = sqlite3.connect("database.db")
+            miConexion = conexion_psql()
             miCursor = miConexion.cursor()
-            miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,"
-                             "deuda,strftime('%d-%m-%Y',fecha)  FROM venta WHERE dni=" + consulta_id + " AND venta=1")
+            miCursor.execute(
+                "SELECT venta.id, producto.codigo, usuario.nombre, usuario.dni, producto.descripcion, producto.color, producto.talla, producto.precio,"
+                " to_char( venta.fecha , 'DD-MON-YYYY') AS fecha_formato, venta.pago, venta.deuda FROM venta INNER JOIN producto"
+                " ON venta.producto = producto.id INNER JOIN usuario ON venta.usuario = usuario.id"
+                " WHERE venta.venta=false AND producto.codigo='" + consulta.get().upper() + "'"
+            )
             if len(consulta.get()) < 4:
                 messagebox.showwarning("ERROR", "Debes ingresar un articulo correcto")
                 root.deiconify()
@@ -219,21 +245,24 @@ def planillaList():
                 suma_deuda = 0
                 suma_total = 0
                 for producto in productos:
-                    suma += int(producto[3]) - int(producto[11])
-                    suma_deuda += int(producto[11])
-                    suma_total += int(producto[3])
+                    suma += int(producto[7]) - int(producto[10])
+                    suma_deuda += int(producto[10])
+                    suma_total += int(producto[7])
                     ventas.config(text="{}".format("** Ventas $" + str(suma) + " **"))
                     deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
                     total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
                     lista.insert("", 0, text=str(producto[0]),
                                  values=(
-                                     str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]),
-                                     str(producto[4]), str(producto[5]),
-                                     str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
+                                     str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
+                                     str(producto[5]),
+                                     str(producto[6]),
+                                     str(producto[7]), str(producto[8]), str(producto[9]), str(producto[10])))
 
-                    data.append((str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]),
-                                 "$" + str(producto[11]),
-                                 str(producto[12])))
+                    data.append(
+                        (str(producto[1]), str(producto[4]), "$" + str(producto[7]), str(producto[2]),
+                         "$" + str(producto[10]),
+                         str(producto[8])))
+
                     crear_pdf(data, suma, suma_deuda, suma_total)
 
         except:
@@ -247,32 +276,7 @@ def planillaList():
         if x != "()":
             for i in x:
                 lista.delete(i)
-        miConexion = sqlite3.connect("database.db")
-        miCursor = miConexion.cursor()
-        miCursor.execute(
-            "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda,"
-            "strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=1")
-        productos = miCursor.fetchall()
-        data = [("COD", "DESCRIPCION", "PRECIO", "CLIENTE", "DEUDA", "FECHA")]
-        suma = 0
-        suma_deuda = 0
-        suma_total = 0
-        for producto in productos:
-            suma += int(producto[3]) - int(producto[11])
-            suma_deuda += int(producto[11])
-            suma_total += int(producto[3])
-            ventas.config(text="{}".format("** Ventas $" + str(suma) + " **"))
-            deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
-            total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
-            lista.insert("", 0, text=str(producto[0]),
-                         values=(str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]),
-                                 str(producto[4]), str(producto[5]),
-                                 str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
-
-            data.append(
-                (str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
-                 str(producto[12])))
-            crear_pdf(data, suma, suma_deuda, suma_total)
+        insertar_datos()
 
     # Busqueda
     Label(root, text="Ingrese DNI", bg="white").place(x=15, y=30)
@@ -357,32 +361,38 @@ def planillaList():
     lista.heading("J", text="Deuda")
     lista.column("J", minwidth=0, width=70)
     # Lista de productos vendidos
-    miConexion = sqlite3.connect("database.db")
-    miCursor = miConexion.cursor()
-    miCursor.execute("SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda,"
-                     "strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=1")
-    productos = miCursor.fetchall()
-    data = [("COD", "DESCRIPCION", "PRECIO", "CLIENTE", "DEUDA", "FECHA")]
-    suma = 0
-    suma_deuda = 0
-    suma_total = 0
-    for producto in productos:
-        suma += int(producto[3]) - int(producto[11])
-        suma_deuda += int(producto[11])
-        suma_total += int(producto[3])
-        ventas.config(text="{}".format("** Ventas $" + str(suma) + " **"))
-        deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
-        total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
-        lista.insert("", 0, text=str(producto[0]),
-                     values=(
-                     str(producto[1]), str(producto[7]), str(producto[8]), str(producto[2]), str(producto[4]),
-                     str(producto[5]),
-                     str(producto[3]), str(producto[12]), str(producto[9]), str(producto[11])))
+    def insertar_datos():
+        miConexion = conexion_psql()
+        miCursor = miConexion.cursor()
+        miCursor.execute(
+        "SELECT venta.id, producto.codigo, usuario.nombre, usuario.dni, producto.descripcion, producto.color, producto.talla, producto.precio,"
+        " to_char( venta.fecha , 'DD-MON-YYYY') AS fecha_formato, venta.pago, venta.deuda FROM venta INNER JOIN producto"
+        " ON venta.producto = producto.id INNER JOIN usuario ON venta.usuario = usuario.id"
+        " WHERE venta.venta=false")
+        productos = miCursor.fetchall()
+        data = [("COD", "DESCRIPCION", "PRECIO", "CLIENTE", "DEUDA", "FECHA")]
+        suma = 0
+        suma_deuda = 0
+        suma_total = 0
+        for producto in productos:
+            suma += int(producto[7]) - int(producto[10])
+            suma_deuda += int(producto[10])
+            suma_total += int(producto[7])
+            ventas.config(text="{}".format("** Ventas $" + str(suma) + " **"))
+            deuda.config(text="{}".format("** Deuda $" + str(suma_deuda) + " **"))
+            total.config(text="{}".format("** Total $" + str(suma_total) + " **"))
+            lista.insert("", 0, text=str(producto[0]),
+                         values=(
+                         str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
+                         str(producto[6]),
+                         str(producto[7]), str(producto[8]), str(producto[9]), str(producto[10])))
 
-        data.append(
-            (str(producto[1]), str(producto[2]), "$" + str(producto[3]), str(producto[7]), "$" + str(producto[11]),
-             str(producto[12])))
-        crear_pdf(data, suma, suma_deuda, suma_total)
+            data.append(
+                (str(producto[1]), str(producto[4]), "$" + str(producto[7]), str(producto[2]), "$" + str(producto[10]),
+                 str(producto[8])))
+            crear_pdf(data, suma, suma_deuda, suma_total)
+
+    insertar_datos()
 
     root.mainloop()
 

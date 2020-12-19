@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox, ttk
 import sqlite3
+from conexion import conexion_psql
 import os
 
 
@@ -23,7 +24,7 @@ def usuarioForm():
 
     # Funcion Guardar
     def guardarUsuario():
-        miConexion = sqlite3.connect("database.db")
+        miConexion = conexion_psql()
         miCursor = miConexion.cursor()
         if nombre.get() == "":
             messagebox.showerror("ERROR", "Debes completar todos lo campos")
@@ -51,7 +52,7 @@ def usuarioForm():
             root.deiconify()
 
         else:
-            miCursor.execute("INSERT INTO usuario VALUES(NULL, '" + nombre.get() +
+            miCursor.execute("INSERT INTO usuario(nombre, dni, dir, tel) VALUES('" + nombre.get() +
                              "','" + dni.get() +
                              "','" + dir.get() +
                              "','" + tel.get() +

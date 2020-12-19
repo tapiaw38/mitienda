@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import messagebox, ttk
 import os
 import sqlite3
+from conexion import conexion_psql
 
 
 def ventaForm():
@@ -17,41 +18,41 @@ def ventaForm():
 
     # Variables
 
-    art = StringVar()
+    art = IntVar()
     art_E = Entry(root, textvariable=art)
-    compra = StringVar()
-    compra.set(0)
+    compra = BooleanVar()
+    compra.set(True)
     consulta = StringVar()
     desc = StringVar()
     color = StringVar()
     talle = StringVar()
     precio = StringVar()
+    fecha_hoy = StringVar()
+    usuario_id = IntVar()
 
     # Funciones
     def buscar_product():
         try:
-            texto = consulta.get().upper()
-            global consulta_id
-            consulta_id = texto.lstrip("ART-")
-            miConexion = sqlite3.connect("database.db")
+
+            global consulta_codigo
+            consulta_codigo = consulta.get().upper()
+            miConexion = conexion_psql()
             miCursor = miConexion.cursor()
-            miCursor.execute("SELECT * FROM productos WHERE ID=" + consulta_id + " AND existe=1 ")
+            miCursor.execute("SELECT * FROM producto WHERE codigo=" + "'" + consulta_codigo + "'" + " AND existe=true ")
             productos = miCursor.fetchall()
             for producto in productos:
                 art.set(producto[0])
-                desc.set(producto[1])
-                precio.set(producto[2])
-                color.set(producto[3])
-                talle.set(producto[4])
+                desc.set(producto[2])
+                precio.set(producto[3])
+                color.set(producto[4])
+                talle.set(producto[5])
             miConexion.commit()
         except:
             messagebox.showwarning("ERROR", "Busqueda invalida, intentalo de nuevo")
             root.deiconify()
 
     def guardarVenta():
-        if compra.get() == "0":
-            miConexion = sqlite3.connect("database.db")
-            miCursor = miConexion.cursor()
+        if compra.get() == True:
             if desc.get() == "":
                 messagebox.showerror("ERROR", "Debes ingresar el cofigo de un producto")
                 root.deiconify()
@@ -66,29 +67,21 @@ def ventaForm():
                 root.deiconify()
             else:
                 # Actualiza el estado de producto
-                miConexion = sqlite3.connect("database.db")
+                miConexion = conexion_psql()
                 miCursor = miConexion.cursor()
-                miCursor.execute("UPDATE productos SET existe='" + "0" +
-                                 "' WHERE ID=" + str(consulta_id))
-                miConexion.commit()
+                miCursor.execute("UPDATE producto SET existe='" + "false" +
+                                 "' WHERE codigo=" + "'" +consulta_codigo + "'")
+                #miConexion.commit()
 
                 # Guardar en ventas
                 hoy = datetime.datetime.today()
-                fecha_hoy = hoy.strftime("%Y-%m-%d")
-                articulo = "ART-" + art.get()
-                miCursor.execute("INSERT INTO venta VALUES(NULL, "
-                                 "'" + str(articulo) +
-                                 "','" + desc.get().upper() +
-                                 "','" + precio.get() +
-                                 "','" + color.get().upper() +
-                                 "','" + talle.get().upper() +
-                                 "','" + compra.get() +
-                                 "','" + "" +
-                                 "','" + "" +
-                                 "','" + "" +
-                                 "','" + "" +
-                                 "','" + "" +
-                                 "','" + fecha_hoy +
+                fecha_hoy.set(hoy.strftime('%Y/%m/%d'))
+                print(art.get())
+
+                miCursor.execute("INSERT INTO venta(producto, venta, fecha) VALUES(" +
+                                 "'" + str(art.get()) +
+                                 "','" + str(compra.get()) +
+                                 "','" + fecha_hoy.get() +
                                  "')")
                 miConexion.commit()
                 opcion = messagebox.askquestion("Mis ventas", " Producto vendido!\n¿Quieres seguir vendiendo?")
@@ -99,7 +92,7 @@ def ventaForm():
                     root.destroy()
 
 
-        elif compra.get() == "1" and desc.get() != "":
+        elif compra.get() == False and desc.get() != "":
             root2 = Toplevel()
             root2.title("Venta por planilla")
             root2.geometry("300x200+600+430")
@@ -116,9 +109,9 @@ def ventaForm():
             # Buscar persona
             def buscar_persona():
                 try:
-                    miConexion = sqlite3.connect("database.db")
+                    miConexion = conexion_psql()
                     miCursor = miConexion.cursor()
-                    miCursor.execute("SELECT ID, nombre, dni, dir, tel FROM usuario WHERE dni=" + consulta_dni.get())
+                    miCursor.execute("SELECT ID, nombre, dni, dir, tel FROM usuario WHERE dni=" + "'" + consulta_dni.get() + "'")
                     if len(consulta_dni.get()) > 8 or len(consulta_dni.get()) < 8:
                         messagebox.showwarning("ERROR", "Debes ingresar el DNI sin puntos")
                         root.deiconify()
@@ -126,6 +119,7 @@ def ventaForm():
                         usuarios = miCursor.fetchall()
                         for usuario in usuarios:
                             nombre.set(usuario[1])
+                            usuario_id.set(usuario[0])
                         miConexion.commit()
 
                 except:
@@ -133,8 +127,7 @@ def ventaForm():
                     root.deiconify()
 
             def vender_planilla():
-                miConexion = sqlite3.connect("database.db")
-                miCursor = miConexion.cursor()
+
                 if nombre.get() == "":
                     messagebox.showerror("ERROR", "Debes ingresar un cliente")
                     root2.deiconify()
@@ -146,30 +139,24 @@ def ventaForm():
                     root2.deiconify()
                 else:
                     # Actualiza el estado de producto
-                    miConexion = sqlite3.connect("database.db")
+                    miConexion = conexion_psql()
                     miCursor = miConexion.cursor()
-                    miCursor.execute("UPDATE productos SET existe='" + "0" +
-                                     "' WHERE ID=" + str(consulta_id))
-                    miConexion.commit()
+                    miCursor.execute("UPDATE producto SET existe='" + "false" +
+                                     "' WHERE codigo=" + "'" +consulta_codigo + "'")
 
                     # Guardar en ventas
-                    hoy = str(datetime.datetime.now())
-                    articulo = "ART-" + art.get()
+                    hoy = datetime.datetime.today()
+                    fecha_hoy.set(hoy.strftime('%Y/%m/%d'))
                     deuda = float(precio.get()) - float(abonar.get())
                     interes = 1
-                    miCursor.execute("INSERT INTO venta VALUES(NULL, "
-                                     "'" + str(articulo) +
-                                     "','" + desc.get().upper() +
-                                     "','" + precio.get() +
-                                     "','" + color.get().upper() +
-                                     "','" + talle.get().upper() +
-                                     "','" + compra.get() +
-                                     "','" + nombre.get() +
-                                     "','" + consulta_dni.get() +
-                                     "','" + abonar.get() +
+                    miCursor.execute("INSERT INTO venta(producto, venta, pago, interes, deuda, fecha, usuario) VALUES("
+                                     "'" + str(art.get()) +
+                                     "','" + str(compra.get()) +
+                                     "','" + str(abonar.get()) +
                                      "','" + str(interes) +
                                      "','" + str(deuda) +
-                                     "','" + hoy +
+                                     "','" + fecha_hoy.get() +
+                                     "','" + str(usuario_id.get()) +
                                      "')")
                     miConexion.commit()
                     root2.destroy()
@@ -228,8 +215,8 @@ def ventaForm():
 
     Label(root, text="Pago", bg="white").place(x=10, y=290)
 
-    Radiobutton(root, text='Planilla', bg="white", variable=compra, value=1).place(x=80, y=290)
-    Radiobutton(root, text='Contado', bg="white", variable=compra, value=0).place(x=160, y=290)
+    Radiobutton(root, text='Planilla', bg="white", variable=compra, value=False).place(x=80, y=290)
+    Radiobutton(root, text='Contado', bg="white", variable=compra, value=True).place(x=160, y=290)
 
     # Boton Vender
     img_venta = PhotoImage(file="img/bolsa-compra.png")

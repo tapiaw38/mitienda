@@ -10,6 +10,7 @@ from listas.lista_stock import stockList
 from listas.lista_vendidos import vendidosList
 from listas.lista_planilla import planillaList
 from calc import calc
+from conexion import conexion_psql
 
 # configuracion de la raiz de la ventana
 ventana_menu = Tk()
@@ -34,7 +35,6 @@ frame.place(x=0,y=670)
 #    x=160, y=0)
 
 # funciones internas
-
 
 
 def clave():
@@ -82,39 +82,52 @@ def clave():
 # Crear tabla producto
 def crear_db(root2):
     try:
-        bd = sqlite3.connect("database.db")
+        bd = conexion_psql()
         cursor = bd.cursor()
         tablas = [
-            "CREATE TABLE IF NOT EXISTS productos("
-                "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                "descripcion VARCHAR NOT NULL,"
-                "precio REAL NOT NULL,"
-                "color VARCHAR NOT NULL,"
-                "talla VARCHAR NOT NULL,"
-                "existe INTEGER NOT NULL);",
+
+            "CREATE TABLE IF NOT EXISTS producto("
+                "id integer NOT NULL DEFAULT nextval('producto_id_seq'::regclass),"
+                "codigo character varying(100) COLLATE pg_catalog.'default' NOT NULL,"
+                "descripcion character varying(150) COLLATE pg_catalog.'default',"
+                "precio real NOT NULL,"
+                "color character varying(50) COLLATE pg_catalog.'default',"
+                "talla character varying(20) COLLATE pg_catalog.'default',"
+                "existe boolean NOT NULL,"
+                "CONSTRAINT producto_pkey PRIMARY KEY (id))"
+                " WITCH (OIDS = FALSE) TABLESPACE pg_default;",
+            "ALTER TABLE public.producto OWNER to postgres;",
 
             "CREATE TABLE IF NOT EXISTS usuario("
-                "id INTEGER NOT NULL,"
-                "nombre	INTEGER NOT NULL,"
-                "dni VARCHAR NOT NULL UNIQUE,"
-                "dir VARCHAR NOT NULL,"
-                "tel VARCHAR,"
-                "PRIMARY KEY(id));",
+                "id integer NOT NULL DEFAULT nextval('usuario_id_seq'::regclass),"
+                "nombre character varying(100) COLLATE pg_catalog.'default' NOT NULL,"
+                "dni character varying(8) COLLATE pg_catalog.'default' NOT NULL,"
+                "dir character varying(100) COLLATE pg_catalog.'default',"
+                "tel character varying(10) COLLATE pg_catalog.'default',"
+                "CONSTRAINT usuario_pkey PRIMARY KEY (id))"
+                " WITCH (OIDS = FALSE) TABLESPACE pg_default;",
+            "ALTER TABLE public.usuario OWNER to postgres;",
 
             "CREATE TABLE IF NOT EXISTS venta("
-                "id	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                "codigo	VARCHAR NOT NULL,"
-                "descripcion VARCHAR NOT NULL,"
-                "precio	NUMERIC NOT NULL,"
-                "color VARCHAR NOT NULL,"
-                "talla VARCHAR NOT NULL,"
-                "venta INTEGER NOT NULL,"
-                "nombre VARCHAR,"
-                "dni VARCHAR,"
-                "pago REAL,"
-                "interes NUMERIC,"
-                "deuda REAL,"
-                "fecha DATE);"
+                "id integer NOT NULL DEFAULT nextval('venta_id_seq'::regclass),"
+                "producto integer NOT NULL"
+                "venta boolean NOT NULL,"
+                "pago real,"
+                "interes real,"
+                "deuda real,"
+                "fecha date NOT NULL,"
+                "usuario integer,"
+                "CONSTRAINT venta_pkey PRIMARY KEY (id),"
+                "CONSTRAINT venta_producto_fkey FOREIGN KEY (producto)"
+                " REFERENCES public.producto (id) MATCH SIMPLE"
+                " ON UPDATE CASCADE"
+                " ON DELETE CASCADE,"
+                " CONSTRAINT venta_usuario_fkey FOREIGN KEY (usuario)"
+                " REFERENCES public.usuario (id) MATCH SIMPLE"
+                " ON UPDATE CASCADE"
+                " ON DELETE SET NULL)"
+                " WITCH (OIDS = FALSE) TABLESPACE pg_default;",
+            "ALTER TABLE public.venta OWNER to postgres;",
 
         ]
         for tabla in tablas:
@@ -122,7 +135,7 @@ def crear_db(root2):
         messagebox.showinfo("Crear DB","Tablas creadas correctamente")
         root2.destroy()
     except sqlite3.OperationalError as error:
-        messagebox.showinfo("Error al abrir:", error)
+        messagebox.showinfo("Error al crear tablas:", error)
 
 
 

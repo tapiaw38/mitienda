@@ -10,6 +10,7 @@ from statistics import mean
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 import webbrowser as wb
+from conexion import conexion_psql
 
 
 
@@ -27,7 +28,7 @@ def vendidosList():
     f4 = StringVar()
     f5 = StringVar()
     f6 = StringVar()
-    consulta = StringVar()
+    consulta_codigo = StringVar()
 
     # Funciones
 
@@ -37,17 +38,20 @@ def vendidosList():
         if x != "()":
             for i in x:
                 lista.delete(i)
-        miConexion = sqlite3.connect("database.db")
+        miConexion = conexion_psql()
         miCursor = miConexion.cursor()
         miCursor.execute(
-            "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda,strftime('%d-%m-%Y',fecha) FROM venta WHERE venta=0 AND fecha BETWEEN " + "'" + f3.get() + "-" +
-            f2.get() + "-" +
+            "SELECT venta.id, producto.codigo, producto.descripcion, producto.precio, producto.color, producto.talla,"
+            " to_char( venta.fecha , 'DD-MON-YYYY') AS fecha_formato FROM venta INNER JOIN producto"
+            " ON venta.producto = producto.id WHERE venta.venta=true"
+            " AND venta.fecha BETWEEN " + "'" + f3.get() + "/" +
+            f2.get() + "/" +
             f1.get() +
             "'" +
             " AND " +
             "'" +
-            f6.get() + "-" +
-            f5.get() + "-" +
+            f6.get() + "/" +
+            f5.get() + "/" +
             f4.get() +
             "'")
         productos = miCursor.fetchall()
@@ -59,10 +63,10 @@ def vendidosList():
             lista.insert("", 0, text=str(producto[0]),
                          values=(
                              str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
-                             str(producto[5]), str(producto[12])))
+                             str(producto[5]), str(producto[6])))
 
             data.append((str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                         str(producto[12])))
+                         str(producto[6])))
             crear_pdf(data, suma)
 
     def grouper(iterable, n):
@@ -96,16 +100,17 @@ def vendidosList():
     def abrir_pdf():
         wb.open_new("Mi_tienda.pdf")
 
+
     # Funcion Buscar Producto
     def buscaDatos():
         try:
-            texto = consulta.get().upper()
-            consulta_id = texto.lstrip("ART-")
-            miConexion = sqlite3.connect("database.db")
+            miConexion = conexion_psql()
             miCursor = miConexion.cursor()
             miCursor.execute(
-                "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes,deuda,strftime('%d-%m-%Y',fecha)  FROM venta WHERE ID=" + consulta_id + " AND venta=0")
-            if len(consulta.get()) < 4:
+                "SELECT venta.id, producto.codigo, producto.descripcion, producto.precio, producto.color, producto.talla,"
+                " to_char( venta.fecha , 'DD-MON-YYYY') AS fecha_formato FROM venta INNER JOIN producto"
+                " ON venta.producto = producto.id WHERE venta.venta=true AND producto.codigo='" + consulta_codigo.get().upper() + "'")
+            if len(consulta_codigo.get()) < 4:
                 messagebox.showwarning("ERROR", "Debes ingresar un articulo correcto")
                 root.deiconify()
             else:
@@ -122,10 +127,10 @@ def vendidosList():
                     lista.insert("", 0, text=str(producto[0]),
                                  values=(
                                      str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
-                                     str(producto[5]), str(producto[12])))
+                                     str(producto[5]), str(producto[6])))
                     data.append(
                         (str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                         str(producto[12])))
+                         str(producto[6])))
                     crear_pdf(data, suma)
 
         except:
@@ -138,27 +143,11 @@ def vendidosList():
         if x != "()":
             for i in x:
                 lista.delete(i)
-        miConexion = sqlite3.connect("database.db")
-        miCursor = miConexion.cursor()
-        miCursor.execute(
-            "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda, strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
-        productos = miCursor.fetchall()
-        data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
-        suma = 0
-        for producto in productos:
-            suma += int(producto[3])
-            ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
-            lista.insert("", 0, text=str(producto[0]),
-                         values=(
-                             str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
-                             str(producto[5]), str(producto[12])))
-            data.append((str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]), str(producto[5]),
-                         str(producto[12])))
-            crear_pdf(data, suma)
+        insertar_datos()
 
     # Busqueda
     Label(root, text="Ingrese codigo", bg="white").place(x=15, y=30)
-    entrada5 = Entry(root, width=15, textvariable=consulta).place(x=100, y=30)
+    entrada5 = Entry(root, width=15, textvariable=consulta_codigo).place(x=100, y=30)
     ttk.Button(root, text="Buscar", command=buscaDatos).place(x=200, y=30)
 
     # Busqueda por fechas
@@ -216,23 +205,29 @@ def vendidosList():
     lista.heading("F", text="Fecha")
     lista.column("F", minwidth=0, width=120)
     # Lista de productos vendidos
-    miConexion = sqlite3.connect("database.db")
-    miCursor = miConexion.cursor()
-    miCursor.execute(
-        "SELECT id, codigo, descripcion, precio, color, talla, venta, nombre, dni, pago, interes, deuda, strftime('%d-%m-%Y',fecha)  FROM venta  WHERE venta=0")
-    productos = miCursor.fetchall()
-    data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
-    suma = 0
-    for producto in productos:
-        suma += int(producto[3])
-        ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
-        lista.insert("", 0, text=str(producto[0]),
-                     values=(
-                         str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
-                         str(producto[5]),
-                         str(producto[12])))
-        data.append((str(producto[1]), str(producto[2]), "$"+str(producto[3]), str(producto[4]), str(producto[5]),
-                     str(producto[12])))
-        crear_pdf(data, suma)
+    def insertar_datos():
+        miConexion = conexion_psql()
+        miCursor = miConexion.cursor()
+        miCursor.execute(
+            "SELECT venta.id, producto.codigo, producto.descripcion, producto.precio, producto.color, producto.talla,"
+            " to_char( venta.fecha , 'DD-MON-YYYY') AS fecha_formato FROM venta INNER JOIN producto"
+            " ON venta.producto = producto.id WHERE venta.venta=true")
+        productos = miCursor.fetchall()
+
+        data = [("COD", "DESCRIPCION", "PRECIO", "COLOR", "TALLA", "FECHA")]
+        suma = 0
+        for producto in productos:
+            suma += int(producto[3])
+            ventas.config(text="{}".format("** Dinero en ventas $" + str(suma) + " **"))
+            lista.insert("", 0, text=str(producto[0]),
+                         values=(
+                             str(producto[1]), str(producto[2]), str(producto[3]), str(producto[4]),
+                             str(producto[5]),
+                             str(producto[6])))
+            data.append((str(producto[1]), str(producto[2]), "$"+str(producto[3]), str(producto[4]), str(producto[5]),
+                         (producto[6])))
+
+            crear_pdf(data, suma)
+    insertar_datos()
 
     root.mainloop()
